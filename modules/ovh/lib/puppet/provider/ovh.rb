@@ -30,24 +30,13 @@ class Puppet::Provider::Ovh < Puppet::Provider
                             :'X-Ovh-Signature'   => sig, 
                             :'X-Ovh-Consumer'    => @resource[:consumerkey]))
   end
-  def post(query,jsondata=nil)
+  def post(query,jsondata)
       query = @@url+query
       debug "post #{query}"
       now = Time.now.to_i.to_s
       sig = self.create_request('post', query,JSON.dump(jsondata))
       RestClient.post(query, JSON.dump(jsondata), :content_type        => :json, 
                                                              :accept              => :json, 
-                                                             :'X-Ovh-Application' => @resource[:applicationkey], 
-                                                             :'X-Ovh-Timestamp'   => now,
-                                                             :'X-Ovh-Signature'   => sig, 
-                                                             :'X-Ovh-Consumer'    => @resource[:consumerkey])
-  end
-  def post(query)
-      query = @@url+query
-      debug "post #{query}"
-      now = Time.now.to_i.to_s
-      sig = self.create_request('post', query)
-      RestClient.post(query,  {},                            :accept              => :json, 
                                                              :'X-Ovh-Application' => @resource[:applicationkey], 
                                                              :'X-Ovh-Timestamp'   => now,
                                                              :'X-Ovh-Signature'   => sig, 
@@ -129,7 +118,7 @@ class Puppet::Provider::Ovh < Puppet::Provider
   def refresh_domain
     debug "refresh_domain"
     query = "/domains/#{@resource[:servicename]}/refresh"
-    self.post(query)
+    self.post(query, {})
   end
 end
 
